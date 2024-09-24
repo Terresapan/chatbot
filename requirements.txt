@@ -1,2 +1,5 @@
 streamlit
 openai
+langchain_openai
+langchain_core 
+langgraph
