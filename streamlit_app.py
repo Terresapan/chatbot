@@ -93,7 +93,7 @@ if st.sidebar.button("Submit Feedback"):
     else:
         st.sidebar.error("Please enter your feedback before submitting.")
 
-st.sidebar.image("/workspaces/chatbot/icon01.png")  # Replace with your image URL
+st.sidebar.image("assets/icon01.png", use_column_width=True)
 
 # ask user for their OpenAI API key via `st.text_input`.
 groq_api_key = st.text_input("Groq API Key", type="password")
