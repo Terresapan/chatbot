@@ -84,7 +84,7 @@ if st.sidebar.button("Submit Feedback"):
 
         # Store feedback to a text file
         try:
-            feedback_file_path = "/workspaces/chatbot/feedback.txt"
+            feedback_file_path = "feedback/feedback.txt"
             with open(feedback_file_path, "a") as feedback_file:
                 feedback_file.write(feedback + "\n")  # Append feedback with a newline
             st.session_state.feedback = ""  # Clear feedback after submission
