@@ -62,7 +62,7 @@ st.write(
 # Ask user for their OpenAI API key via `st.text_input`.
 groq_api_key = st.text_input("Groq API Key", type="password")
 if not groq_api_key:
-    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+    st.info("Please add your Groq API key to continue.", icon="🗝️")
 else:
     # Create an OpenAI client.
     model = ChatGroq(model="llama-3.1-70b-versatile", temperature=0.7, api_key=groq_api_key)
