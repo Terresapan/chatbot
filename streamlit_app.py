@@ -56,7 +56,7 @@ compiled_debate_graph = debate_graph.compile()
 # Show title and description.
 st.title("💬 Marketing Tagline Generator and Critique")
 st.write(
-    "This chatbot generates and self-critiques marketing taglines using LangGraph. To use this app, you need to provide an Groq API key, which you can get [here](https://console.groq.com/keys) for free. "
+    "This chatbot generates and self-critiques marketing taglines using LangGraph. To use this app, you need to provide a Groq API key, which you can get [here](https://console.groq.com/keys) for free. "
 )
 
 # Ask user for their OpenAI API key via `st.text_input`.
