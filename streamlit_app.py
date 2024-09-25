@@ -2,81 +2,128 @@ import streamlit as st
 from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, MessagesState, END
 
-# Here is LangGraph logic
-class ReflectionState(MessagesState):
+# here is langgraph logic
+class reflectionstate(MessagesState):
     product_description: str
     target_audience: str
     selling_point: str
 
-# Define the logic for each node
-from langchain_core.messages import SystemMessage, HumanMessage
-def generate_agent(state: ReflectionState):
+# define the logic for each node
+def generate_agent(state: reflectionstate):
     generate_prompt = """
-    You are a marketing copy writer tasked with writing excellent product tagline. Respond with a revised version of your previous attempts if reflection_agent provides critique.
+    You are a marketing copywriter tasked with writing an excellent product tagline. Respond with a revised version of your previous attempts if the reflection_agent provides critique.
     Write a tagline for the given {product_description}, based on {target_audience} and {selling_point}. Revise your output based on {messages}.
     """
-    prompt = generate_prompt.format(product_description=state["product_description"], target_audience=state["target_audience"], selling_point=state["selling_point"], messages=state["messages"])
-    response = model.invoke(prompt)
-    return {"messages": [{"role": "ai", "content": response.content}]}
+    prompt = generate_prompt.format(product_description=state["product_description"],
+                                     target_audience=state["target_audience"],
+                                     selling_point=state["selling_point"],
+                                     messages=state["messages"])
 
-def reflection_agent(state: ReflectionState):
+    try:
+        response = model.invoke(prompt)
+        return {"messages": [{"role": "ai", "content": response.content}]}
+    except Exception as e:
+        return {"messages": [{"role": "ai", "content": f"Error generating tagline: {str(e)}"}]}
+
+def reflection_agent(state: reflectionstate):
     generate_prompt = """
-    You are a marketing expert tasked with providing critiue for product tagling. Do not rewrite the tagline directly, but always provide recommendations, including requests for length, relevence, style, etc on how to improve.
-    Provide recommendations on how to imporve the tagline for the given {product_description}, {target_audience}, and {selling_point} based on {messages}.
+    You are a marketing expert tasked with providing critique for product taglines. Do not rewrite the tagline directly, but always provide recommendations, including requests for length, relevance, style, etc. on how to improve.
+    Provide recommendations on how to improve the tagline for the given {product_description}, {target_audience}, and {selling_point} based on {messages}.
     """
-    prompt = generate_prompt.format(product_description=state["product_description"], target_audience=state["target_audience"], selling_point=state["selling_point"], messages=state["messages"])
-    response = model.invoke(prompt)
-    return {"messages": [{"role": "ai", "content": response.content}]}
+    prompt = generate_prompt.format(product_description=state["product_description"],
+                                     target_audience=state["target_audience"],
+                                     selling_point=state["selling_point"],
+                                     messages=state["messages"])
 
+    try:
+        response = model.invoke(prompt)
+        return {"messages": [{"role": "ai", "content": response.content}]}
+    except Exception as e:
+        return {"messages": [{"role": "ai", "content": f"Error generating critique: {str(e)}"}]}
 
-def should_loop(state: ReflectionState):
-    if len(state['messages']) <= 4:
-      return "reflection"
-    return END
+def should_loop(state: reflectionstate):
+    return "reflection" if len(state['messages']) <= 4 else END
 
-# Create the graph
-debate_graph = StateGraph(ReflectionState)
+# create the graph
+debate_graph = StateGraph(reflectionstate)
 
-# Add nodes
+# add nodes
 debate_graph.add_node("generate", generate_agent)
 debate_graph.add_node("reflection", reflection_agent)
 
-# Define edges
+# define edges
 debate_graph.add_conditional_edges("generate", should_loop)
 debate_graph.add_edge("reflection", "generate")
 
-# Set entry point
+# set entry point
 debate_graph.set_entry_point("generate")
 
-# Compile the graph
+# compile the graph
 compiled_debate_graph = debate_graph.compile()
 
-# Below is Streamlit Chatbot Interface
+# Enhanced Streamlit chatbot interface
+st.sidebar.header("💬 Marketing Tagline Generator")
+st.sidebar.markdown("This app generates and critiques marketing taglines. To use this App, you need to provide a Groq API key, which you can get [here](https://console.groq.com/keys) for free.")
+st.sidebar.write("### Instructions")
+st.sidebar.write(":spiral_note_pad: Enter your product or service description, target audience, and selling points.")
+st.sidebar.write(":point_right: Click 'Generate Tagline' to receive tagline suggestions and a whole critique process.")
+st.sidebar.write(":heart_decoration: Tell me your thoughts and feedback about the App.")
 
-# Show title and description.
-st.title("💬 Marketing Tagline Generator and Critique")
-st.write(
-    "This chatbot generates and self-critiques marketing taglines using LangGraph. To use this app, you need to provide a Groq API key, which you can get [here](https://console.groq.com/keys) for free. "
-)
+# Initialize session state for feedback storage if not already done
+if 'feedback' not in st.session_state:
+    st.session_state.feedback = ""
 
-# Ask user for their OpenAI API key via `st.text_input`.
+# Feedback Form
+st.sidebar.subheader("Feedback Form")
+feedback = st.sidebar.text_area("Your Thoughts and Feedback", value=st.session_state.feedback, placeholder="Share your feedback here...")
+    
+
+if st.sidebar.button("Submit Feedback"):
+    if feedback:
+        st.sidebar.success("Thank you for your feedback! 😊")
+
+        # Store feedback to a text file
+        try:
+            feedback_file_path = "/workspaces/chatbot/feedback.txt"
+            with open(feedback_file_path, "a") as feedback_file:
+                feedback_file.write(feedback + "\n")  # Append feedback with a newline
+            st.session_state.feedback = ""  # Clear feedback after submission
+        except Exception as e:
+            st.sidebar.error(f"Error saving feedback: {str(e)}")
+    else:
+        st.sidebar.error("Please enter your feedback before submitting.")
+
+st.sidebar.image("/workspaces/chatbot/icon01.png")  # Replace with your image URL
+
+# ask user for their OpenAI API key via `st.text_input`.
 groq_api_key = st.text_input("Groq API Key", type="password")
 if not groq_api_key:
     st.info("Please add your Groq API key to continue.", icon="🗝️")
 else:
-    # Create an OpenAI client.
+    # create an openai client
     model = ChatGroq(model="llama-3.1-70b-versatile", temperature=0.7, api_key=groq_api_key)
 
-    # Input field for user to input a product description
-    product_description_input = st.text_input("Enter a product / service description (e.g., Organic soup)")
-    target_audience_input = st.text_input("Enter the target audience (e.g., for working adults):")
-    selling_point_input = st.text_input("Enter key selling points (e.g., Ready in 5 minutes):")
+    # input field for user to input a product description
+    st.header("Enter Product Details")
+    product_description_input = st.text_input("Enter a Product/Service Description (e.g., organic soup)")
+    target_audience_input = st.text_input("Enter the Target Audience (e.g., for working adults):")
+    selling_point_input = st.text_input("Enter Key Selling Points (e.g., ready in 5 minutes):")
 
-    # Button to trigger tagline generation
-    if st.button("Generate Tagline") and product_description_input and target_audience_input and selling_point_input:
-        # Set up the initial state (ReflectionState object)
-        input = {"product_description": product_description_input, "target_audience": target_audience_input, "selling_point": selling_point_input}
-        messages = compiled_debate_graph.invoke(input=input)
-        for m in messages["messages"]:
-            st.write(m.content)
+    # button to trigger tagline generation
+    if st.button("Generate Tagline"):
+        # Validate inputs
+        if not product_description_input or not target_audience_input or not selling_point_input:
+            st.error("Please fill out all fields to generate a tagline.", icon="🚫")
+        else:
+            # Set up the initial state (reflectionstate object)
+            input_state = {"product_description": product_description_input,
+                           "target_audience": target_audience_input,
+                           "selling_point": selling_point_input,
+                           "messages": []}
 
+            # Invoke the compiled debate graph
+            messages = compiled_debate_graph.invoke(input=input_state)
+            # Display messages
+            st.subheader("Generated Tagline")
+            for m in messages["messages"]:
+                st.write(f"🚨 AI: {m.content}")
