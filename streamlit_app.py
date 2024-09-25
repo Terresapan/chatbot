@@ -69,8 +69,6 @@ else:
     if st.button("Generate Tagline") and product_input:
         # Set up the initial state (ReflectionState object)
         input = {"product": product_input}
-        messages = compiled_debate_graph.invoke(input)
-
-        for m in messages['messages']:
-            st.write(m.content)
-
+        for chunk in compiled_debate_graph.stream(input, stream_mode="values"):
+            for m in chunk["messages"]:
+                st.write(m.content)
