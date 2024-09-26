@@ -6,12 +6,21 @@ class reflectionstate(MessagesState):
     target_audience: str
     selling_point: str
 
+generate_prompt = """
+    You are a marketing copywriter tasked with writing an excellent product tagline. 
+    Respond with a revised version of your previous attempts if the reflection_agent provides critique.
+    Write a tagline for the given {product_description}, based on {target_audience} and {selling_point}. 
+    Revise your output based on {messages}.
+    """
+
+reflection_prompt = """
+    You are a marketing expert tasked with providing critique for product taglines. 
+    Provide recommendations on how to improve the tagline for the given {product_description}, {target_audience}, 
+    and {selling_point} based on {messages}.
+    """
+
 # Generate agent logic
 def generate_agent(state: reflectionstate, model):
-    generate_prompt = """
-    You are a marketing copywriter tasked with writing an excellent product tagline. Respond with a revised version of your previous attempts if the reflection_agent provides critique.
-    Write a tagline for the given {product_description}, based on {target_audience} and {selling_point}. Revise your output based on {messages}.
-    """
     prompt = generate_prompt.format(
         product_description=state["product_description"],
         target_audience=state["target_audience"],
@@ -26,10 +35,7 @@ def generate_agent(state: reflectionstate, model):
 
 # Reflection agent logic
 def reflection_agent(state: reflectionstate, model):
-    generate_prompt = """
-    You are a marketing expert tasked with providing critique for product taglines. Provide recommendations on how to improve the tagline for the given {product_description}, {target_audience}, and {selling_point} based on {messages}.
-    """
-    prompt = generate_prompt.format(
+    prompt = reflection_prompt.format(
         product_description=state["product_description"],
         target_audience=state["target_audience"],
         selling_point=state["selling_point"],
