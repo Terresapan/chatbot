@@ -1,5 +1,5 @@
 import streamlit as st
-from graph_logic import setup_critique_graph, reflectionstate
+from graph_logic import setup_critique_graph
 from langchain_groq import ChatGroq
 from utils import save_feedback
 
@@ -40,7 +40,7 @@ if not groq_api_key:
     st.info("Please add your Groq API key to continue.", icon="🗝️")
 else:
     # create an openai client
-    model = ChatGroq(model="llama-3.1-70b-versatile", temperature=0.7, api_key=groq_api_key)
+    model = ChatGroq(model="llama-3.1-70b-versatile", temperature=0.8, api_key=groq_api_key)
 
     # input field for user to input a product description
     st.header("Enter Product Details")
@@ -55,7 +55,10 @@ else:
             st.error("Please fill out all fields to generate a tagline.", icon="🚫")
         else:
             # Set up the initial state (reflectionstate object)
-            input_state = reflectionstate
+            input_state = {"product_description": product_description_input,
+                           "target_audience": target_audience_input,
+                           "selling_point": selling_point_input,
+                           "messages": []}
             # Setup graph and inject model
             critique_graph = setup_critique_graph(model)
             # Invoke the compiled debate graph
