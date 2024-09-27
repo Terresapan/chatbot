@@ -32,7 +32,7 @@ if st.sidebar.button("Submit Feedback"):
     else:
         st.sidebar.error("Please enter your feedback before submitting.")
 
-st.sidebar.image("assets/icon01.png", use_column_width=True)
+st.sidebar.image("assets/logoP.PNG", use_column_width=True)
 
 # ask user for their OpenAI API key via `st.text_input`.
 groq_api_key = st.text_input("Groq API Key", type="password", placeholder="Your Groq API Key here...")
