@@ -4,4 +4,3 @@ langchain_openai
 langchain-groq
 langchain_core 
 langgraph
-python-dotenv

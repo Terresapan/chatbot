@@ -3,13 +3,9 @@ from graph_logic import setup_critique_graph
 from langchain_groq import ChatGroq
 from utils import save_feedback
 import os
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_API_KEY"] = os.getenv('LANGCHAIN_API_KEY')
+os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]["API_KEY"]
 os.environ["LANGCHAIN_PROJECT"] = "Tagline Generator"
 
 
