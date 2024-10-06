@@ -2,6 +2,16 @@ import streamlit as st
 from graph_logic import setup_critique_graph
 from langchain_groq import ChatGroq
 from utils import save_feedback
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_API_KEY"] = os.getenv('LANGCHAIN_API_KEY')
+os.environ["LANGCHAIN_PROJECT"] = "Tagline Generator"
+
 
 # Enhanced Streamlit chatbot interface
 st.sidebar.header("💬 Marketing Tagline Generator")
@@ -32,7 +42,7 @@ if st.sidebar.button("Submit Feedback"):
     else:
         st.sidebar.error("Please enter your feedback before submitting.")
 
-st.sidebar.image("assets/logoP.PNG", use_column_width=True)
+st.sidebar.image("assets/logo01.jpg", use_column_width=True)
 
 # ask user for their OpenAI API key via `st.text_input`.
 groq_api_key = st.text_input("Groq API Key", type="password", placeholder="Your Groq API Key here...")
