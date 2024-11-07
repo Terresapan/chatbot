@@ -6,7 +6,7 @@ import os
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]["API_KEY"]
-os.environ["LANGCHAIN_PROJECT"] = "Tagline Generator"
+os.environ["LANGCHAIN_PROJECT"] = "Tagline_Generator"
 
 
 # Enhanced Streamlit chatbot interface
