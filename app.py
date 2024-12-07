@@ -46,7 +46,7 @@ if not groq_api_key:
     st.info("Please add your Groq API key to continue.", icon="🗝️")
 else:
     # create an openai client
-    model = ChatGroq(model="llama-3.1-70b-versatile", temperature=0.8, api_key=groq_api_key)
+    model = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.8, api_key=groq_api_key)
 
     # input field for user to input a product description
     st.header("Enter Product Details")
